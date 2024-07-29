@@ -1,5 +1,6 @@
 import pandas as pd
 from openai import OpenAI
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
 # Function to mock ChatGPT response (since we can't interact with OpenAI API here)
 def mock_chatgpt_response(question):
@@ -24,6 +25,22 @@ def get_chatgpt_response(question):
         return response.choices[0].message
     except Exception as e:
         return f"Error: {str(e)}"
+
+# Replace 'model_name' with the appropriate model available on Hugging Face
+model_name = "facebook/llama"  # Example placeholder, replace with actual model if available
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForCausalLM.from_pretrained(model_name)
+
+# Initialize the pipeline
+from transformers import pipeline
+generator = pipeline('text-generation', model=model, tokenizer=tokenizer)
+
+# Function to get response from Hugging Face model
+def get_huggingface_response(question):
+    response = generator(question, max_length=50, num_return_sequences=1)
+    return response[0]['generated_text'].strip()
+
+
 
 # Read the CSV file
 file_path = "/home/linxy29/data/GeneRAG/GeneTurining_partial.csv"  # Change this to your actual file path
